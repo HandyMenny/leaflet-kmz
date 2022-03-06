@@ -112,7 +112,10 @@ export function toGeoJSON(xml, props) {
 export function toXML(data) {
 	var text = data;
 	if (data instanceof ArrayBuffer) {
-		text = String.fromCharCode.apply(null, new Uint8Array(data));
+		data = new Uint8Array(data);
+	}
+	if (data instanceof Uint8Array) {
+		text = strFromU8(data);
 		var encoding = text.substring(0, text.indexOf("?>")).match(/encoding\s*=\s*["'](.*)["']/i);
 		if (encoding) {
 			text = new TextDecoder(encoding[1]).decode(data);
@@ -136,7 +139,7 @@ export function unzip(folder) {
 								[name, 'data:' + mime + ';base64,' + value]);
 					}
 					return new Promise((r) =>
-						r([name, strFromU8(entry)])); // [ fileName, stringValue ]
+						r([name, entry])); // [ fileName, stringValue ]
 				});
 
 			// Return KMZ files.
