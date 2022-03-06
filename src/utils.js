@@ -117,7 +117,7 @@ export function toXML(data) {
 	if (data instanceof Uint8Array) {
 		text = strFromU8(data);
 		var encoding = text.substring(0, text.indexOf("?>")).match(/encoding\s*=\s*["'](.*)["']/i);
-		if (encoding) {
+		if (encoding && encoding[1].toUpperCase() !== "UTF-8") {
 			text = new TextDecoder(encoding[1]).decode(data);
 		}
 	}
