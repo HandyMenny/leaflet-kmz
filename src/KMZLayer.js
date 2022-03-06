@@ -7,6 +7,7 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 		bindPopup: true,
 		bindTooltip: true,
 		preferCanvas: false,
+		httpsRewrite: true
 	},
 
 	initialize: function(kmzUrl, options) {
@@ -65,12 +66,22 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 
 	_geometryToLayer: function(data, xml) {
 		var preferCanvas = this._map ? this._map.options.preferCanvas : this.options.preferCanvas;
+		var httpsRewrite = this.options.httpsRewrite;
 		// parse GeoJSON
 		var layer = L.geoJson(data, {
 			pointToLayer: (feature, latlng) => {
+				var iconUrl = data.properties.icons[feature.properties.icon];
+
+				if (!iconUrl) {
+					iconUrl = feature.properties.icon;
+					if (httpsRewrite) {
+						iconUrl = iconUrl.replace(/^http:\/\//i, 'https://');
+					}
+				}
+
 				if (preferCanvas) {
 					return L.kmzMarker(latlng, {
-						iconUrl: data.properties.icons[feature.properties.icon] || feature.properties.icon,
+						iconUrl: iconUrl,
 						iconSize: [28, 28],
 						iconAnchor: [14, 14],
 						interactive: this.options.interactive,
@@ -79,7 +90,7 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 				// TODO: handle L.svg renderer within the L.KMZMarker class?
 				return L.marker(latlng, {
 					icon: L.icon({
-						iconUrl: data.properties.icons[feature.properties.icon] || feature.properties.icon,
+						iconUrl: iconUrl,
 						iconSize: [28, 28],
 						iconAnchor: [14, 14],
 					}),
