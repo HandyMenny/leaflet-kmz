@@ -103,8 +103,7 @@ export function parseGroundOverlay(xml, props) {
 	return new L.KMZImageOverlay(href, bounds, { opacity: options.opacity, angle: options.rotation });
 }
 
-export function toGeoJSON(data, props) {
-	var xml = data instanceof XMLDocument ? data : toXML(data);
+export function toGeoJSON(xml, props) {
 	var json = kmlToGeoJSON(xml);
 	json.properties = L.extend({}, json.properties, props || {});
 	return json;

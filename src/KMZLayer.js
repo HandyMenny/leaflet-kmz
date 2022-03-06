@@ -57,7 +57,7 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 	},
 
 	_parseKML: function(data, props) {
-		var xml = _.toXML(data, props);
+		var xml = _.toXML(data);
 		var geojson = _.toGeoJSON(xml, props);
 		var layer = (this.options.geometryToLayer || this._geometryToLayer).call(this, geojson, xml);
 		this.addLayer(layer);
