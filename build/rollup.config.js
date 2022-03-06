@@ -11,13 +11,11 @@ let output = {
   sourcemap: true,
   name: plugin.name,
   globals: {
-    'jszip': 'JSZip',
-    'geojson-vt': 'geojsonvt',
     '@tmcw/togeojson': 'toGeoJSON',
   }
 };
 
-let external = ['jszip', 'geojson-vt', '@tmcw/togeojson', 'leaflet-pointable'];
+let external = ['@tmcw/togeojson', 'leaflet-pointable'];
 let plugins = [
   resolve(),
   commonJS({

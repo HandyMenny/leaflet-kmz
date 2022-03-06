@@ -1,4 +1,4 @@
-// import JSZip from 'jszip';
+import {strFromU8, unzip as unzipAsync} from "fflate";
 // import * as toGeoJSON from '@tmcw/togeojson';
 
 export function loadFile(url) {
@@ -137,33 +137,30 @@ export function toXML(data) {
 
 export function unzip(folder) {
 	return new Promise((resolve, reject) => {
-		window.JSZip.loadAsync(folder)
-			.then((zip) => {
+		unzipAsync(new Uint8Array(folder), (err, unzipped) => {
+			var files = Object.keys(unzipped)
+				.map((name) => {
+					var entry = unzipped[name];
+					if (isImageFile(name)) {
+						var ext = getFileExt(name);
+						var mime = getMimeType(name, ext);
 
-				// Parse KMZ files.
-				var files = Object.keys(zip.files)
-					.map((name) => {
-						var entry = zip.files[name];
-						if (isImageFile(name)) {
-							var ext = getFileExt(name);
-							var mime = getMimeType(name, ext);
-							return entry
-								.async("base64")
-								.then((value) => [name, 'data:' + mime + ';base64,' + value]);
-						}
-						return entry
-							.async("text")
-							.then((value) => [name, value]); // [ fileName, stringValue ]
-					});
+						return base64FromU8(entry)
+							.then((value) =>
+								[name, 'data:' + mime + ';base64,' + value]);
+					}
+					return new Promise((r) =>
+						r([name, strFromU8(entry)])); // [ fileName, stringValue ]
+				});
 
-				// Return KMZ files.
-				Promise.all(files).then((list) =>
-					resolve(list.reduce((obj, item) => {
-						obj[item[0]] = item[1]; // { fileName: stringValue }
-						return obj;
-					}, {}))
-				);
-			});
+			// Return KMZ files.
+			Promise.all(files).then((list) =>
+				resolve(list.reduce((obj, item) => {
+					obj[item[0]] = item[1]; // { fileName: stringValue }
+					return obj;
+				}, {}))
+			);
+		});
 	});
 }
 
@@ -173,4 +170,19 @@ export function readFile(file) {
 		fr.onload = () => resolve(fr.result);
 		fr.readAsArrayBuffer(file);
 	});
+}
+
+function base64FromU8(array) {
+	return new Promise((resolve) => {
+		const reader = new FileReader()
+		reader.onload = () => {
+			/*
+				The result looks like
+				"data:application/octet-stream;base64,<your base64 data>",
+				so we split off the beginning
+			*/
+			resolve(reader.result.split(",", 2)[1]);
+		}
+		reader.readAsDataURL(new Blob([array]))
+	})
 }

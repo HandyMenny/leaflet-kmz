@@ -148,9 +148,6 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 		var urls = [];
 		var host = 'https://unpkg.com/';
 
-		if (typeof window.JSZip !== 'function') {
-			urls.push(host + 'jszip@3.7.1/dist/jszip.min.js');
-		}
 		if (typeof window.toGeoJSON !== 'object') {
 			urls.push(host + '@tmcw/togeojson@4.5.0/dist/togeojson.umd.js');
 		}
