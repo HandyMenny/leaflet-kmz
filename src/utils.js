@@ -1,5 +1,5 @@
 import {strFromU8, unzip as unzipAsync} from "fflate";
-// import * as toGeoJSON from '@tmcw/togeojson';
+import { kml as kmlToGeoJSON } from '@tmcw/togeojson';
 
 export function loadFile(url) {
 	return new Promise((resolve, reject) => {
@@ -66,19 +66,6 @@ export function isZipped(file) {
 	return 'PK' === String.fromCharCode(new Uint8Array(file, 0, 1), new Uint8Array(file, 1, 1));
 }
 
-export function lazyLoader(urls, promise) {
-	return promise instanceof Promise ? promise : Promise.all(urls.map(url => loadJS(url)))
-}
-
-export function loadJS(url) {
-	return new Promise((resolve, reject) => {
-		let tag = document.createElement("script");
-		tag.addEventListener('load', resolve.bind(url), { once: true });
-		tag.src = url;
-		document.head.appendChild(tag);
-	});
-}
-
 export function parseLatLonBox(xml) {
 	let box = L.latLngBounds([
 		xml.getElementsByTagName('south')[0].childNodes[0].nodeValue,
@@ -118,7 +105,7 @@ export function parseGroundOverlay(xml, props) {
 
 export function toGeoJSON(data, props) {
 	var xml = data instanceof XMLDocument ? data : toXML(data);
-	var json = window.toGeoJSON.kml(xml);
+	var json = kmlToGeoJSON(xml);
 	json.properties = L.extend({}, json.properties, props || {});
 	return json;
 }

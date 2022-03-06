@@ -9,13 +9,10 @@ let output = {
   file: "dist/" + plugin.name + "-src.js",
   format: "umd",
   sourcemap: true,
-  name: plugin.name,
-  globals: {
-    '@tmcw/togeojson': 'toGeoJSON',
-  }
+  name: plugin.name
 };
 
-let external = ['@tmcw/togeojson', 'leaflet-pointable'];
+let external = ['leaflet-pointable'];
 let plugins = [
   resolve(),
   commonJS({

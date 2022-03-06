@@ -24,13 +24,11 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 	},
 
 	load: function(kmzUrl) {
-		L.KMZLayer._jsPromise = _.lazyLoader(this._requiredJSModules(), L.KMZLayer._jsPromise)
-			.then(() => this._load(kmzUrl));
+		this._load(kmzUrl);
 	},
 
 	loadFile: function(file) {
-		L.KMZLayer._jsPromise = _.lazyLoader(this._requiredJSModules(), L.KMZLayer._jsPromise)
-			.then(() => _.readFile(file).then((data) => this._parse(data, { name: file.name, icons: {}})));
+		_.readFile(file).then((data) => this._parse(data, { name: file.name, icons: {}}));
 	},
 
 	_load: function(url) {
@@ -142,17 +140,6 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 			}
 		}
 		return layer;
-	},
-
-	_requiredJSModules: function() {
-		var urls = [];
-		var host = 'https://unpkg.com/';
-
-		if (typeof window.toGeoJSON !== 'object') {
-			urls.push(host + '@tmcw/togeojson@4.5.0/dist/togeojson.umd.js');
-		}
-
-		return urls;
 	},
 });
 
