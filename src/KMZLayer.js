@@ -144,10 +144,10 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 		var host = 'https://unpkg.com/';
 
 		if (typeof window.JSZip !== 'function') {
-			urls.push(host + 'jszip@3.5.0/dist/jszip.min.js');
+			urls.push(host + 'jszip@3.7.1/dist/jszip.min.js');
 		}
 		if (typeof window.toGeoJSON !== 'object') {
-			urls.push(host + '@tmcw/togeojson@4.1.0/dist/togeojson.umd.js');
+			urls.push(host + '@tmcw/togeojson@4.5.0/dist/togeojson.umd.js');
 		}
 
 		return urls;
