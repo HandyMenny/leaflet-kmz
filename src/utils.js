@@ -166,3 +166,11 @@ export function unzip(folder) {
 			});
 	});
 }
+
+export function readFile(file) {
+	return new Promise((resolve, reject) => {
+		var fr = new FileReader();
+		fr.onload = () => resolve(fr.result);
+		fr.readAsArrayBuffer(file);
+	});
+}
