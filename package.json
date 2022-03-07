@@ -42,6 +42,7 @@
   },
   "dependencies": {
     "@tmcw/togeojson": "^4.5.0",
+    "@xmldom/xmldom": "^0.8.1",
     "fflate": "^0.7.3"
   }
 }

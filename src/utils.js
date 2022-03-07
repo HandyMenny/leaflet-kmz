@@ -1,5 +1,6 @@
 import {strFromU8, unzip as unzipAsync} from "fflate";
 import { kml as kmlToGeoJSON } from '@tmcw/togeojson';
+import { DOMParser } from '@xmldom/xmldom'
 
 export function loadFile(url) {
 	return new Promise((resolve, reject) => {

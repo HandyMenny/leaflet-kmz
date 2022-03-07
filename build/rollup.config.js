@@ -16,7 +16,7 @@ let external = ['leaflet-pointable'];
 let plugins = [
   resolve(),
   commonJS({
-    include: '../node_modules/**'
+    include: ['../node_modules/**', '**/node_modules/@xmldom/xmldom/lib/*.js']
   })
 ];
 
