@@ -7,7 +7,8 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 		bindPopup: true,
 		bindTooltip: true,
 		preferCanvas: false,
-		httpsRewrite: true
+		httpsRewrite: true,
+		splitFolders: true
 	},
 
 	initialize: function(kmzUrl, options) {
@@ -58,10 +59,34 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 
 	_parseKML: function(data, props) {
 		var xml = _.toXML(data);
-		var geojson = _.toGeoJSON(xml, props);
-		var layer = (this.options.geometryToLayer || this._geometryToLayer).call(this, geojson, xml);
-		this.addLayer(layer);
-		this.fire('load', { layer: layer, name: geojson.properties.name });
+		if (this.options.splitFolders) {
+			this._parseFolder(xml, "", props.name, props, false);
+		} else {
+			this._parseNode(xml, props.name, props);
+		}
+	},
+
+	_parseFolder: function(node, prefix, suffix, props, isFolder) {
+		if (isFolder) {
+			prefix += _.getXMLName(node);
+		}
+		var folders = node.getElementsByTagName("Folder");
+		while (folders.length > 0) {
+			var folder = folders.item(0);
+			this._parseFolder(folder, prefix, suffix, props, true);
+			folder.parentNode.removeChild(folder);
+		}
+		return this._parseNode(node, prefix + suffix, props);
+	},
+
+	_parseNode: function(node, name, props) {
+		var geojson = _.toGeoJSON(node, props);
+		// skip empty layers
+		if (geojson.features.length > 0 || node.getElementsByTagName('GroundOverlay').length > 0) {
+			var layer = (this.options.geometryToLayer || this._geometryToLayer).call(this, geojson, node);
+			this.addLayer(layer);
+			this.fire('load', {layer: layer, name: name});
+		}
 	},
 
 	_geometryToLayer: function(data, xml) {

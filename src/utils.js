@@ -40,6 +40,19 @@ export function getFileName(url) {
 	return url.split('/').pop();
 }
 
+export function getXMLName(node) {
+	var nodeName = "";
+	var temp = node.firstChild;
+	while (temp != null) {
+		if (temp.tagName == "name") {
+			nodeName = temp.firstChild.data + " - ";
+			break;
+		}
+		temp = temp.nextSibling;
+	}
+	return nodeName;
+}
+
 export function getMimeType(filename, ext) {
 	var mime = 'text/plain';
 	if (/\.(jpe?g|png|gif|bmp)$/i.test(filename)) {
