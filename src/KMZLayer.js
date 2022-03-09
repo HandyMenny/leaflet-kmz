@@ -8,7 +8,8 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 		bindTooltip: true,
 		preferCanvas: false,
 		httpsRewrite: true,
-		splitFolders: true
+		splitFolders: true,
+		autoAdd: false,
 	},
 
 	initialize: function(kmzUrl, options) {
@@ -85,6 +86,9 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 		if (geojson.features.length > 0 || node.getElementsByTagName('GroundOverlay').length > 0) {
 			var layer = (this.options.geometryToLayer || this._geometryToLayer).call(this, geojson, node);
 			this.addLayer(layer);
+			if (!this.options.autoAdd) {
+				layer.remove();
+			}
 			this.fire('load', {layer: layer, name: name});
 		}
 	},
