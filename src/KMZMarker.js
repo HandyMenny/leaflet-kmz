@@ -23,7 +23,7 @@ L.KMZMarker = L.CircleMarker.extend({
 			icon.drawImage();
 		} else {
 			icon = this._icon = new Image(this.options.iconSize[0], this.options.iconSize[1]);
-			icon.anchor = [icon.width / 2.0, icon.height / 2.0];
+			icon.anchor = icon.iconAnchor ? icon.iconAnchor : [icon.width / 2.0, icon.height / 2.0];
 			icon.onload = icon.drawImage = () => {
 				var isLoaded = icon.complete && icon.naturalHeight !== 0;
 				if(isLoaded) {
