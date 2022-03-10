@@ -10,6 +10,7 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 		httpsRewrite: true,
 		splitFolders: true,
 		autoAdd: false,
+		useOriginalIconSize: false //Scaled down 2x, works only with canvas
 	},
 
 	initialize: function(kmzUrl, options) {
@@ -116,7 +117,7 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 				if (preferCanvas) {
 					return L.kmzMarker(latlng, {
 						iconUrl: iconUrl,
-						iconSize: [size, size],
+						iconSize: this.options.useOriginalIconSize ? null : [size, size],
 						iconScale: scale,
 						iconAnchor: [size / 2.0, size / 2.0],
 						interactive: this.options.interactive,
