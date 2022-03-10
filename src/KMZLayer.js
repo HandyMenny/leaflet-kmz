@@ -100,6 +100,11 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 		var layer = L.geoJson(data, {
 			pointToLayer: (feature, latlng) => {
 				var iconUrl = data.properties.icons[feature.properties.icon];
+				var scale = feature.properties['icon-scale'];
+				if (!scale) {
+					scale = 1;
+				}
+				var size = 28;
 
 				if (!iconUrl) {
 					iconUrl = feature.properties.icon;
@@ -111,17 +116,19 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 				if (preferCanvas) {
 					return L.kmzMarker(latlng, {
 						iconUrl: iconUrl,
-						iconSize: [28, 28],
-						iconAnchor: [14, 14],
+						iconSize: [size, size],
+						iconScale: scale,
+						iconAnchor: [size / 2.0, size / 2.0],
 						interactive: this.options.interactive,
 					});
 				}
+				size *= scale;
 				// TODO: handle L.svg renderer within the L.KMZMarker class?
 				return L.marker(latlng, {
 					icon: L.icon({
 						iconUrl: iconUrl,
-						iconSize: [28, 28],
-						iconAnchor: [14, 14],
+						iconSize: [size, size],
+						iconAnchor: [size / 2.0, size / 2.0],
 					}),
 					interactive: this.options.interactive,
 				});
