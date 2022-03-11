@@ -44,8 +44,8 @@ export function getXMLName(node) {
 	var nodeName = "";
 	var temp = node.firstChild;
 	while (temp != null) {
-		if (temp.tagName == "name") {
-			nodeName = temp.firstChild.data + " - ";
+		if (temp.nodeType === 1 && temp.tagName === "name") {
+			nodeName = temp.firstChild.nodeValue + " - ";
 			break;
 		}
 		temp = temp.nextSibling;
