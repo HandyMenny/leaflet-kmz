@@ -177,6 +177,21 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 				var desc = prop.description || "";
 
 				if (name || desc) {
+					if(desc && this.options.supportBalloonLink) {
+						this.popups[name] = desc;
+						var popups = this.popups;
+						var regex = /href=["']#(.*);balloon["']/;
+						layer.on("popupopen", function (e) {
+							var content = e.popup.getContent();
+							content = content.replace(regex, function (match, p1) {
+								var text = popups[p1].replace("'", "\'");
+								return "style=\"cursor:pointer\"" +
+									"onclick=\"document.getElementsByClassName('leaflet-popup-content')[0].innerHTML=" +
+									"'" + text + "'\"";
+							});
+							layer.setPopupContent(content);
+						});
+					}
 					if (this.options.bindPopup) {
 						layer.bindPopup('<div>' + '<b>' + name + '</b>' + '<br>' + desc + '</div>');
 					}
