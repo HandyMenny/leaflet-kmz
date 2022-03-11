@@ -26,6 +26,7 @@ L.KMZMarker = L.CircleMarker.extend({
 			icon = this._icon = new Image(original ? 0 : this.options.iconSize[0], original ? 0 : this.options.iconSize[1]);
 			icon.scale = this.options.iconScale;
 			icon.anchor = icon.iconAnchor ? icon.iconAnchor : [icon.width / 2.0, icon.height / 2.0];
+			icon.heading = this.options.iconHeading;
 			icon.onload = icon.drawImage = () => {
 				var isLoaded = icon.complete && icon.naturalHeight !== 0;
 				if(isLoaded) {
@@ -42,10 +43,18 @@ L.KMZMarker = L.CircleMarker.extend({
 						icon.scale = 1;
 					}
 
-					var p = layer._point.subtract(icon.anchor);
+					var p = layer._point;
 					var ctx = renderer._ctx;
-
-					ctx.drawImage(icon, p.x, p.y, icon.width, icon.height);
+					if(icon.heading !== 0) {
+						ctx.save();
+						ctx.translate(p.x, p.y);
+						ctx.rotate(icon.heading * Math.PI / 180);
+						ctx.drawImage(icon, -icon.anchor[0], -icon.anchor[1], icon.width, icon.height);
+						ctx.restore();
+					} else {
+						p = p.subtract(icon.anchor);
+						ctx.drawImage(icon, p.x, p.y, icon.width, icon.height);
+					}
 				}
 				// Removed in Leaflet 1.4.0
 				// if (renderer._drawnLayers) renderer._drawnLayers[layer._leaflet_id] = layer;

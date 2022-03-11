@@ -105,6 +105,10 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 				if (!scale) {
 					scale = 1;
 				}
+				var heading = feature.properties['icon-heading'];
+				if (!heading) {
+					heading = 0;
+				}
 				var size = 28;
 
 				if (!iconUrl) {
@@ -120,6 +124,7 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 						iconSize: this.options.useOriginalIconSize ? null : [size, size],
 						iconScale: scale,
 						iconAnchor: [size / 2.0, size / 2.0],
+						iconHeading: heading,
 						interactive: this.options.interactive,
 					});
 				}
