@@ -53,6 +53,18 @@ export function getXMLName(node) {
 	return nodeName;
 }
 
+export function countXMLSubFolders(node, max) {
+	var count = 0;
+	var temp = node.firstChild;
+	while (temp != null && count < max) {
+		if (temp.nodeType === 1 && temp.tagName === "Folder") {
+			count++;
+		}
+		temp = temp.nextSibling;
+	}
+	return count;
+}
+
 export function getMimeType(filename, ext) {
 	var mime = 'text/plain';
 	if (/\.(jpe?g|png|gif|bmp)$/i.test(filename)) {

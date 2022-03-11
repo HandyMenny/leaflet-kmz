@@ -10,7 +10,8 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 		httpsRewrite: true,
 		splitFolders: true,
 		autoAdd: false,
-		useOriginalIconSize: false //Scaled down 2x, works only with canvas
+		useOriginalIconSize: false, //Scaled down 2x, works only with canvas
+		maxSubFolders: 10 // < 0 = infinite
 	},
 
 	initialize: function(kmzUrl, options) {
@@ -73,10 +74,15 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 			prefix += _.getXMLName(node);
 		}
 		var folders = node.getElementsByTagName("Folder");
-		while (folders.length > 0) {
-			var folder = folders.item(0);
-			this._parseFolder(folder, prefix, suffix, props, true);
-			folder.parentNode.removeChild(folder);
+		if (folders.length > 0) {
+			var maxSubFolders = this.options.maxSubFolders;
+			if(maxSubFolders < 0 || _.countXMLSubFolders(node, maxSubFolders) < maxSubFolders) {
+				do {
+					var folder = folders.item(0);
+					this._parseFolder(folder, prefix, suffix, props, true);
+					folder.parentNode.removeChild(folder);
+				} while(folders.length > 0);
+			}
 		}
 		return this._parseNode(node, prefix + suffix, props);
 	},
