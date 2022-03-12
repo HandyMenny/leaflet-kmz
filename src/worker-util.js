@@ -9,7 +9,7 @@ self.onmessage = function (e) {
         var props = e.data.props;
         options = e.data.options;
         if (options.splitFolders) {
-            var style = getXMLElements(xml, 'Style').concat(getXMLElements(xml, 'StyleMap'));
+            var style = getXMLElements(xml, 'Style', true).concat(getXMLElements(xml, 'StyleMap', true));
             parseFolder(xml, "", props.name, props, style, false);
         } else {
             parseNode(xml, props.name, props, []);
@@ -100,11 +100,14 @@ function countXMLSubFolders(node, max) {
     return count;
 }
 
-function getXMLElements(node, tag) {
+function getXMLElements(node, tag, id) {
     let el = node.getElementsByTagName(tag);
     let arr = [];
-    for (let k = 0; k < el.length; k++) {
-        arr.push(el[k]);
+    // Hard limit searches with id to 1000
+    for (let k = 0; k < el.length && (!id || k < 1000); k++) {
+        if (!id || el[k].getAttribute("id")) {
+            arr.push(el[k]);
+        }
     }
     return arr;
 }
