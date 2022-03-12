@@ -1,4 +1,5 @@
 import * as _ from './utils';
+import Worker from 'web-worker:../dist/worker-util';
 
 export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 	options: {
@@ -11,8 +12,11 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 		splitFolders: true,
 		autoAdd: false,
 		useOriginalIconSize: false, //Scaled down 2x, works only with canvas
-		maxSubFolders: 10 // < 0 = infinite
+		maxSubFolders: 10, // < 0 = infinite
+		supportBalloonLink: true // Experimental
 	},
+	popups: {},
+	worker: false,
 
 	initialize: function(kmzUrl, options) {
 		L.extend(this.options, options);
@@ -61,46 +65,29 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 	},
 
 	_parseKML: function(data, props) {
-		var xml = _.toXML(data);
-		if (this.options.splitFolders) {
-			this._parseFolder(xml, "", props.name, props, false);
-		} else {
-			this._parseNode(xml, props.name, props);
-		}
-	},
-
-	_parseFolder: function(node, prefix, suffix, props, isFolder) {
-		if (isFolder) {
-			prefix += _.getXMLName(node);
-		}
-		var folders = node.getElementsByTagName("Folder");
-		if (folders.length > 0) {
-			var maxSubFolders = this.options.maxSubFolders;
-			if(maxSubFolders < 0 || _.countXMLSubFolders(node, maxSubFolders) < maxSubFolders) {
-				do {
-					var folder = folders.item(0);
-					this._parseFolder(folder, prefix, suffix, props, true);
-					folder.parentNode.removeChild(folder);
-				} while(folders.length > 0);
+		if(!this.worker) {
+			this.worker = new Worker();
+			var src = this;
+			this.worker.onmessage = function(e) {
+				var name = e.data.name;
+				var geojson = e.data.geojson;
+				var groundOverlays = e.data.groundOverlays;
+				var layer = (src.options.geometryToLayer || src._geometryToLayer).call(src, geojson, groundOverlays);
+				src.addLayer(layer);
+				if (!src.options.autoAdd) {
+					layer.remove();
+				}
+				src.fire('load', {layer: layer, name: name});
 			}
 		}
-		return this._parseNode(node, prefix + suffix, props);
+		this.worker.postMessage({
+			xml: data,
+			props: props,
+			options: this.options
+		});
 	},
 
-	_parseNode: function(node, name, props) {
-		var geojson = _.toGeoJSON(node, props);
-		// skip empty layers
-		if (geojson.features.length > 0 || node.getElementsByTagName('GroundOverlay').length > 0) {
-			var layer = (this.options.geometryToLayer || this._geometryToLayer).call(this, geojson, node);
-			this.addLayer(layer);
-			if (!this.options.autoAdd) {
-				layer.remove();
-			}
-			this.fire('load', {layer: layer, name: name});
-		}
-	},
-
-	_geometryToLayer: function(data, xml) {
+	_geometryToLayer: function(data, groundOverlays) {
 		var preferCanvas = this._map ? this._map.options.preferCanvas : this.options.preferCanvas;
 		var httpsRewrite = this.options.httpsRewrite;
 		// parse GeoJSON
@@ -209,9 +196,8 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 			}
 		});
 		// parse GroundOverlays
-		let el = xml.getElementsByTagName('GroundOverlay');
-		for (let l, k = 0; k < el.length; k++) {
-			l = _.parseGroundOverlay(el[k], data.properties);
+		for (let l, k = 0; k < groundOverlays.length; k++) {
+			l = _.parseGroundOverlay(groundOverlays[k], data.properties);
 			if (l) {
 				layer.addLayer(l);
 			}

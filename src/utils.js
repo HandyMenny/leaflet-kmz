@@ -1,6 +1,4 @@
-import {strFromU8, unzip as unzipAsync} from "fflate";
-import { kml as kmlToGeoJSON } from '@tmcw/togeojson';
-import { DOMParser } from '@xmldom/xmldom'
+import { unzip as unzipAsync } from "fflate";
 
 export function loadFile(url) {
 	return new Promise((resolve, reject) => {
@@ -38,31 +36,6 @@ export function getFileExt(filename) {
 
 export function getFileName(url) {
 	return url.split('/').pop();
-}
-
-export function getXMLName(node) {
-	var nodeName = "";
-	var temp = node.firstChild;
-	while (temp != null) {
-		if (temp.nodeType === 1 && temp.tagName === "name") {
-			nodeName = temp.firstChild.nodeValue + " - ";
-			break;
-		}
-		temp = temp.nextSibling;
-	}
-	return nodeName;
-}
-
-export function countXMLSubFolders(node, max) {
-	var count = 0;
-	var temp = node.firstChild;
-	while (temp != null && count < max) {
-		if (temp.nodeType === 1 && temp.tagName === "Folder") {
-			count++;
-		}
-		temp = temp.nextSibling;
-	}
-	return count;
 }
 
 export function getMimeType(filename, ext) {
@@ -127,27 +100,6 @@ export function parseGroundOverlay(xml, props) {
 		options.rotation = rotation;
 	}
 	return new L.KMZImageOverlay(href, bounds, { opacity: options.opacity, angle: options.rotation });
-}
-
-export function toGeoJSON(xml, props) {
-	var json = kmlToGeoJSON(xml);
-	json.properties = L.extend({}, json.properties, props || {});
-	return json;
-}
-
-export function toXML(data) {
-	var text = data;
-	if (data instanceof ArrayBuffer) {
-		data = new Uint8Array(data);
-	}
-	if (data instanceof Uint8Array) {
-		text = strFromU8(data);
-		var encoding = text.substring(0, text.indexOf("?>")).match(/encoding\s*=\s*["'](.*)["']/i);
-		if (encoding && encoding[1].toUpperCase() !== "UTF-8") {
-			text = new TextDecoder(encoding[1]).decode(data);
-		}
-	}
-	return text ? (new DOMParser()).parseFromString(text, 'text/xml') : document.implementation.createDocument(null, "kml");;
 }
 
 export function unzip(folder) {
