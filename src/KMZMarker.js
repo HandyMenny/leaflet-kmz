@@ -31,8 +31,13 @@ L.KMZMarker = L.CircleMarker.extend({
 				var isLoaded = icon.complete && icon.naturalHeight !== 0;
 				if(isLoaded) {
 					if (icon.height === 0) {
-						icon.width = icon.naturalWidth / 2.0;
-						icon.height = icon.naturalHeight / 2.0;
+						if (icon.naturalWidth <= icon.naturalHeight) {
+							icon.width = 28;
+							icon.height = icon.naturalHeight * 28.0 / icon.naturalWidth;
+						} else {
+							icon.height = 28;
+							icon.width = icon.naturalWidth * 28.0 / icon.naturalHeight;
+						}
 						icon.anchor = [icon.width / 2.0, icon.height / 2.0];
 					}
 

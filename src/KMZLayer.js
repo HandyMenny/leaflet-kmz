@@ -11,7 +11,7 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 		httpsRewrite: true,
 		splitFolders: true,
 		autoAdd: false,
-		useOriginalIconSize: false, //Scaled down 2x, works only with canvas
+		useOriginalIconSize: false, // the smaller between width and height will be set to 28
 		maxSubFolders: 10, // < 0 = infinite
 		supportBalloonLink: true // Experimental
 	},
