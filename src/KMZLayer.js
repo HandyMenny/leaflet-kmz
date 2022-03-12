@@ -69,15 +69,19 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 			this.worker = new Worker();
 			var src = this;
 			this.worker.onmessage = function(e) {
-				var name = e.data.name;
-				var geojson = e.data.geojson;
-				var groundOverlays = e.data.groundOverlays;
-				var layer = (src.options.geometryToLayer || src._geometryToLayer).call(src, geojson, groundOverlays);
-				src.addLayer(layer);
-				if (!src.options.autoAdd) {
-					layer.remove();
+				if (e.data.loaded) {
+					src.fire('loadComplete');
+				} else {
+					var name = e.data.name;
+					var geojson = e.data.geojson;
+					var groundOverlays = e.data.groundOverlays;
+					var layer = (src.options.geometryToLayer || src._geometryToLayer).call(src, geojson, groundOverlays);
+					src.addLayer(layer);
+					if (!src.options.autoAdd) {
+						layer.remove();
+					}
+					src.fire('load', {layer: layer, name: name});
 				}
-				src.fire('load', {layer: layer, name: name});
 			}
 		}
 		this.worker.postMessage({

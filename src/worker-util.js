@@ -14,6 +14,7 @@ self.onmessage = function (e) {
         } else {
             parseNode(xml, props.name, props, []);
         }
+        postMessage({loaded: true});
     }
 };
 
