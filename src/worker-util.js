@@ -9,14 +9,15 @@ self.onmessage = function (e) {
         var props = e.data.props;
         options = e.data.options;
         if (options.splitFolders) {
-            parseFolder(xml, "", props.name, props, false);
+            var style = getXMLElements(xml, 'Style').concat(getXMLElements(xml, 'StyleMap'));
+            parseFolder(xml, "", props.name, props, style, false);
         } else {
-            parseNode(xml, props.name, props);
+            parseNode(xml, props.name, props, []);
         }
     }
 };
 
-function parseFolder(node, prefix, suffix, props, isFolder) {
+function parseFolder(node, prefix, suffix, props, style, isFolder) {
     if (isFolder) {
         prefix += getXMLName(node);
     }
@@ -26,18 +27,21 @@ function parseFolder(node, prefix, suffix, props, isFolder) {
         if(maxSubFolders < 0 || countXMLSubFolders(node, maxSubFolders) < maxSubFolders) {
             do {
                 var folder = folders.item(0);
-                parseFolder(folder, prefix, suffix, props, true);
+                parseFolder(folder, prefix, suffix, props, style, true);
                 folder.parentNode.removeChild(folder);
             } while(folders.length > 0);
         }
     }
-    return parseNode(node, prefix + suffix, props);
+    return parseNode(node, prefix + suffix, props, style);
 }
 
-function parseNode(node, name, props) {
+function parseNode(node, name, props, style) {
+    for (let i=0; i<style.length; i++) {
+        node.appendChild(style[i]);
+    }
     var geojson = toGeoJSON(node, props);
     // skip empty layers
-    var groundOverlays = getGroundOverlays(node);
+    var groundOverlays = getXMLElements(node, 'GroundOverlay');
     if (geojson.features.length > 0 || groundOverlays.length > 0) {
         postMessage({
             name: name,
@@ -95,8 +99,8 @@ function countXMLSubFolders(node, max) {
     return count;
 }
 
-function getGroundOverlays(node) {
-    let el = node.getElementsByTagName('GroundOverlay');
+function getXMLElements(node, tag) {
+    let el = node.getElementsByTagName(tag);
     let arr = [];
     for (let k = 0; k < el.length; k++) {
         arr.push(el[k]);
