@@ -13,7 +13,8 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 		autoAdd: false,
 		useOriginalIconSize: false, // the smaller between width and height will be set to 28
 		maxSubFolders: 10, // < 0 = infinite
-		supportBalloonLink: true // Experimental
+		supportBalloonLink: true, // Experimental
+		defaultIconUrl: "https://maps.google.com/mapfiles/kml/pushpin/ylw-pushpin.png"
 	},
 	popups: {},
 	worker: false,
@@ -97,7 +98,8 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 		// parse GeoJSON
 		var layer = L.geoJson(data, {
 			pointToLayer: (feature, latlng) => {
-				var iconUrl = data.properties.icons[feature.properties.icon];
+				var icon = feature.properties.icon;
+				var iconUrl = icon ? data.properties.icons[icon] : this.options.defaultIconUrl;
 				var scale = feature.properties['icon-scale'];
 				if (!scale) {
 					scale = 1;
@@ -204,7 +206,7 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 			},
 			interactive: this.options.interactive,
 			filter: (feature) => {
-				return feature.geometry.type !== "Point" || feature.properties.icon;
+				return feature.geometry.type !== "Point" || (feature.properties.icon || feature.properties["icon-scale"] != 0);
 			}
 		});
 		// parse GroundOverlays
