@@ -8,6 +8,10 @@ self.onmessage = function (e) {
         var xml = toXML(e.data.xml);
         var props = e.data.props;
         options = e.data.options;
+        var schema = getXMLElements(xml, 'Schema');
+        if (schema.length > 0) {
+            parseSchema(xml, schema);
+        }
         if (options.splitFolders) {
             var style = getXMLElements(xml, 'Style', true).concat(getXMLElements(xml, 'StyleMap', true));
             parseFolder(xml, "", props.name, props, style, false);
@@ -110,4 +114,17 @@ function getXMLElements(node, tag, id) {
         }
     }
     return arr;
+}
+
+function parseSchema(xml, schema) {
+    for (let i = 0; i < schema.length; i++) {
+        const tag = schema[i].getAttribute("name");
+        const parent = schema[i].getAttribute("parent");
+        if (tag && parent) {
+            const el = getXMLElements(xml, tag);
+            for (let k = 0; k < el.length; k++) {
+                el[k].tagName = parent;
+            }
+        }
+    }
 }
