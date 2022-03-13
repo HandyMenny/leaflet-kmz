@@ -206,7 +206,7 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 			},
 			interactive: this.options.interactive,
 			filter: (feature) => {
-				return feature.geometry.type !== "Point" || (feature.properties.icon || feature.properties["icon-scale"] != 0);
+				return feature.geometry.type !== "Point" || (feature.properties.icon || feature.properties["icon-scale"] != 0) && !isNaN(feature.geometry.coordinates[0]);
 			}
 		});
 		// parse GroundOverlays
