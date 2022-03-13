@@ -193,6 +193,14 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 						});
 					}
 				}
+				if (feature.geometry.type === "LineString") {
+					try {
+						const coordinates = feature.geometry.coordinates[0];
+						for (let i = 3; i < coordinates.length; i += 3) {
+							layer.addLatLng([coordinates[i + 1], coordinates[i]]);
+						}
+					} catch(ignored){};
+				}
 			},
 			interactive: this.options.interactive,
 			filter: (feature) => {
