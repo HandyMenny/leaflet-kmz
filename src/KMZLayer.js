@@ -88,7 +88,7 @@ export const KMZLayer = L.KMZLayer = L.FeatureGroup.extend({
 		this.worker.postMessage({
 			xml: data,
 			props: props,
-			options: this.options
+			options: _.flattenObject(this.options)
 		});
 	},
 

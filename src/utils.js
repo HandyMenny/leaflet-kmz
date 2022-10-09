@@ -153,3 +153,12 @@ function base64FromU8(array) {
 		reader.readAsDataURL(new Blob([array]))
 	})
 }
+
+// Returns a new simple object with all properties (including inherited ones) of the given object
+export function flattenObject(obj) {
+	const result = {};
+	for (const key in obj) {
+		result[key] = obj[key];
+	}
+	return result;
+}
