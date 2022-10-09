@@ -41,7 +41,7 @@
     "leaflet": "^1.6.0"
   },
   "dependencies": {
-    "@tmcw/togeojson": "^4.5.0",
+    "@tmcw/togeojson": "^5.0.0",
     "@xmldom/xmldom": "^0.8.1",
     "fflate": "^0.7.3",
     "rollup-plugin-web-worker-loader": "^1.6.1"
